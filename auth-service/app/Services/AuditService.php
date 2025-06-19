@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class AuditService
 {
@@ -48,7 +49,7 @@ class AuditService
         try {
             Http::timeout(5)
                 ->post($this->appServiceUrl . '/api/internal/audit-log', $data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to send audit log: ' . $e->getMessage());
         }
     }

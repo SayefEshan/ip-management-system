@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -47,7 +48,7 @@ class GatewayController extends Controller
             // Return the response
             return response($response->body(), $response->status())
                 ->withHeaders($response->headers());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Gateway proxy error: ' . $e->getMessage());
 
             return response()->json([

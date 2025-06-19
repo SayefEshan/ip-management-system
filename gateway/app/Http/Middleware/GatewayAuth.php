@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,7 +50,7 @@ class GatewayAuth
                 'error' => 'Unauthorized',
                 'message' => 'Invalid token'
             ], 401);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'error' => 'Service unavailable',
                 'message' => 'Unable to validate authentication'
