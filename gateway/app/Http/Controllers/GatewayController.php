@@ -29,7 +29,7 @@ class GatewayController extends Controller
             $path = $request->path();
             $method = $request->method();
             $headers = $this->getForwardHeaders($request);
-            dd($path, $method, $headers);
+           
             // Build the full URL
             $url = $serviceUrl . '/' . $path;
 
