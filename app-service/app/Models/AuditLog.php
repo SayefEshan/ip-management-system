@@ -43,4 +43,20 @@ class AuditLog extends Model
     {
         throw new Exception('Audit logs cannot be deleted');
     }
+
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeBySession($query, $sessionId)
+    {
+        return $query->where('session_id', $sessionId);
+    }
+
+    public function scopeByEntity($query, $entityType, $entityId)
+    {
+        return $query->where('entity_type', $entityType)
+            ->where('entity_id', $entityId);
+    }
 }
