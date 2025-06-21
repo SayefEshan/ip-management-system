@@ -23,13 +23,18 @@ class GatewayController extends Controller
         return $this->proxyRequest($request, $this->authServiceUrl);
     }
 
+    public function proxyToApp(Request $request)
+    {
+        return $this->proxyRequest($request, $this->appServiceUrl);
+    }
+
     private function proxyRequest(Request $request, $serviceUrl)
     {
         try {
             $path = $request->path();
             $method = $request->method();
             $headers = $this->getForwardHeaders($request);
-           
+
             // Build the full URL
             $url = $serviceUrl . '/' . $path;
 
@@ -66,6 +71,8 @@ class GatewayController extends Controller
             'X-Forwarded-Host' => $request->getHost(),
             'X-Forwarded-Proto' => $request->getScheme(),
             'X-Original-URI' => $request->getRequestUri(),
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
         ];
 
         // Forward authorization header
