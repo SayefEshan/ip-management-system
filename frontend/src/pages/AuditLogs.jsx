@@ -5,7 +5,7 @@ import { authService } from "../services/auth";
 function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [logType, setLogType] = useState("session");
+  const [logType, setLogType] = useState("user");
   const [ipId, setIpId] = useState("");
 
   const user = authService.getUser();
@@ -21,11 +21,11 @@ function AuditLogs() {
     try {
       let response;
       switch (logType) {
-        case "session":
-          response = await auditService.getSessionLogs();
-          break;
         case "user":
           response = await auditService.getUserLogs();
+          break;
+        case "session":
+          response = await auditService.getSessionLogs();
           break;
         case "all":
           response = await auditService.getAllLogs();
@@ -139,8 +139,8 @@ function AuditLogs() {
                 onChange={(e) => setLogType(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               >
-                <option value="session">Current Session</option>
                 <option value="user">My Lifetime Logs</option>
+                <option value="session">Current Session</option>
                 {user.is_super_admin && (
                   <option value="all">All Logs (Admin)</option>
                 )}
