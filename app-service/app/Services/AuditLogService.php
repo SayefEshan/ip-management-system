@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 class AuditLogService
 {
-    /**
-     * Log user login
-     */
     public function logLogin(array $data): void
     {
         $this->createLog([
@@ -21,9 +18,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Log user logout
-     */
     public function logLogout(array $data): void
     {
         $this->createLog([
@@ -35,9 +29,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Log IP address creation
-     */
     public function logIpCreated($ipAddress, array $userContext): void
     {
         $this->createLog([
@@ -56,9 +47,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Log IP address update
-     */
     public function logIpUpdated($ipAddress, array $oldValues, array $userContext): void
     {
         $changes = [];
@@ -93,9 +81,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Log IP address deletion
-     */
     public function logIpDeleted($ipAddress, array $userContext): void
     {
         $this->createLog([
@@ -114,9 +99,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Log failed login attempt
-     */
     public function logFailedLogin(array $data): void
     {
         $this->createLog([
@@ -128,9 +110,6 @@ class AuditLogService
         ]);
     }
 
-    /**
-     * Create audit log entry
-     */
     private function createLog(array $data): void
     {
         try {
@@ -140,9 +119,6 @@ class AuditLogService
         }
     }
 
-    /**
-     * Get user email from data
-     */
     private function getUserEmail(array $data): string
     {
         return $data['user_email'] ?? 'unknown';

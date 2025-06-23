@@ -14,8 +14,8 @@ class GatewayController extends Controller
 
     public function __construct()
     {
-        $this->authServiceUrl = env('AUTH_SERVICE_URL', 'http://localhost:8001');
-        $this->appServiceUrl = env('APP_SERVICE_URL', 'http://localhost:8002');
+        $this->authServiceUrl = env('AUTH_SERVICE_URL', 'http://auth-service');
+        $this->appServiceUrl = env('APP_SERVICE_URL', 'http://app-service');
     }
 
     public function proxyToAuth(Request $request)

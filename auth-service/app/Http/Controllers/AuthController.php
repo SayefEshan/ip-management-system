@@ -91,7 +91,7 @@ class AuthController extends Controller
             ]);
 
             // Log successful login
-            $this->auditService->logLogin($user->id, $sessionId, $request->ip());
+            $this->auditService->logLogin($user->id, $user->email, $sessionId, $request->ip());
 
             DB::commit();
 
@@ -143,11 +143,15 @@ class AuthController extends Controller
                 ->where('access_token_jti', $payload['jti'])
                 ->update(['revoked' => true]);
 
+            // Get user email
+            $user = User::find($payload['sub']);
+
             // Log logout
             $this->auditService->logLogout(
                 $payload['sub'],
                 $payload['session_id'],
-                $request->ip()
+                $request->ip(),
+                $user->email
             );
 
             DB::commit();

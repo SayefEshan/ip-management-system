@@ -12,26 +12,28 @@ class AuditService
 
     public function __construct()
     {
-        $this->appServiceUrl = env('APP_SERVICE_URL', 'http://localhost:8002');
+        $this->appServiceUrl = env('APP_SERVICE_URL', 'http://app-service');
     }
 
-    public function logLogin(int $userId, string $sessionId, string $ipAddress)
+    public function logLogin(int $userId, string $userEmail, string $sessionId, string $ipAddress)
     {
         $this->sendLog([
             'user_id' => $userId,
+            'user_email' => $userEmail,
             'session_id' => $sessionId,
             'action' => 'LOGIN',
             'ip_address' => $ipAddress
         ]);
     }
 
-    public function logLogout(int $userId, string $sessionId, string $ipAddress)
+    public function logLogout(int $userId, string $sessionId, string $ipAddress, string $userEmail)
     {
         $this->sendLog([
             'user_id' => $userId,
             'session_id' => $sessionId,
             'action' => 'LOGOUT',
-            'ip_address' => $ipAddress
+            'ip_address' => $ipAddress,
+            'user_email' => $userEmail
         ]);
     }
 

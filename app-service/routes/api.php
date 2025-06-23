@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\InternalController;
 use App\Http\Controllers\IPAddressController;
 
 // IP Address routes
@@ -20,4 +21,8 @@ Route::prefix('audit-logs')->group(function () {
     Route::get('/ip-address/{id}/session', [AuditLogController::class, 'ipSessionLogs']);
     Route::get('/ip-address/{id}', [AuditLogController::class, 'ipLogs']);
     Route::get('/all', [AuditLogController::class, 'allLogs']);
+});
+
+Route::prefix('internal')->group(function () {
+    Route::post('/audit-log', [InternalController::class, 'auditLog']);
 });
