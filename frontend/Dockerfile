@@ -1,5 +1,4 @@
-# Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -12,19 +11,8 @@ RUN npm ci
 # Copy application files
 COPY . .
 
-# Build the application
-RUN npm run build
+# Expose Vite dev server port
+EXPOSE 5173
 
-# Production stage
-FROM nginx:alpine
-
-# Copy built files
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy nginx config
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start Vite dev server with host binding for Docker
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]

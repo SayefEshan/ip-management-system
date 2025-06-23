@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # MySQL for auth service
   auth-db:
@@ -43,7 +41,8 @@ services:
     container_name: gateway-service
     restart: unless-stopped
     volumes:
-      - ./gateway/.env:/var/www/.env
+      - ./gateway:/var/www
+      - /var/www/vendor
     ports:
       - "8000:80"
     depends_on:
@@ -60,7 +59,8 @@ services:
     container_name: auth-service
     restart: unless-stopped
     volumes:
-      - ./auth-service/.env:/var/www/.env
+      - ./auth-service:/var/www
+      - /var/www/vendor
     depends_on:
       - auth-db
     networks:
@@ -74,7 +74,8 @@ services:
     container_name: app-service
     restart: unless-stopped
     volumes:
-      - ./app-service/.env:/var/www/.env
+      - ./app-service:/var/www
+      - /var/www/vendor
     depends_on:
       - app-db
     networks:
@@ -87,12 +88,17 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
-      - "3000:80"
+      - "3000:5173"
     depends_on:
       - gateway
     networks:
       - app-network
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
 volumes:
   auth-db-data:
