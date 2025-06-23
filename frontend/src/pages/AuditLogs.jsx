@@ -77,23 +77,33 @@ function AuditLogs() {
 
   const renderChanges = (log) => {
     if (log.action === "CREATE" && log.new_values) {
+      const values =
+        typeof log.new_values === "string"
+          ? JSON.parse(log.new_values)
+          : log.new_values;
+
       return (
-        <div className="text-xs">
-          <span className="font-medium">Created:</span>
-          <pre className="mt-1 text-gray-600">
-            {JSON.stringify(log.new_values, null, 2)}
-          </pre>
+        <div className="text-xs space-y-1">
+          <div className="font-medium text-gray-700">Created:</div>
+          {Object.entries(values).map(([key, value]) => (
+            <div key={key} className="pl-2">
+              <span className="text-gray-600">{key}:</span>{" "}
+              <span className="text-gray-900">{value || "-"}</span>
+            </div>
+          ))}
         </div>
       );
     }
+
     if (log.action === "UPDATE" && log.metadata?.changes) {
       return (
-        <div className="text-xs">
+        <div className="text-xs space-y-1">
+          <div className="font-medium text-gray-700">Updated:</div>
           {Object.entries(log.metadata.changes).map(
             ([field, [oldVal, newVal]]) => (
-              <div key={field} className="mb-1">
-                <span className="font-medium">{field}:</span>
-                <span className="text-red-600"> {oldVal}</span>
+              <div key={field} className="pl-2">
+                <span className="text-gray-600">{field}:</span>
+                <span className="text-red-600 line-through"> {oldVal}</span>
                 <span> → </span>
                 <span className="text-green-600">{newVal}</span>
               </div>
@@ -102,17 +112,45 @@ function AuditLogs() {
         </div>
       );
     }
+
     if (log.action === "DELETE" && log.old_values) {
+      const values =
+        typeof log.old_values === "string"
+          ? JSON.parse(log.old_values)
+          : log.old_values;
+
       return (
-        <div className="text-xs">
-          <span className="font-medium">Deleted:</span>
-          <pre className="mt-1 text-gray-600">
-            {JSON.stringify(log.old_values, null, 2)}
-          </pre>
+        <div className="text-xs space-y-1">
+          <div className="font-medium text-gray-700">Deleted:</div>
+          {Object.entries(values).map(([key, value]) => (
+            <div key={key} className="pl-2">
+              <span className="text-gray-600">{key}:</span>{" "}
+              <span className="text-gray-900">{value || "-"}</span>
+            </div>
+          ))}
         </div>
       );
     }
-    return <span className="text-gray-400">-</span>;
+
+    if (log.metadata) {
+      const metadata =
+        typeof log.metadata === "string"
+          ? JSON.parse(log.metadata)
+          : log.metadata;
+
+      if (metadata.email || metadata.attempted_email) {
+        return (
+          <div className="text-xs">
+            <span className="text-gray-600">Attempted email:</span>{" "}
+            <span className="text-gray-900">
+              {metadata.email || metadata.attempted_email}
+            </span>
+          </div>
+        );
+      }
+    }
+
+    return <span className="text-gray-400 text-xs">-</span>;
   };
 
   return (
