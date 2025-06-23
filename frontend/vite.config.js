@@ -1,18 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+  },
+  // API proxy is only for development
   server: {
-    port: 5173,
-    host: '0.0.0.0',
     proxy: {
       "/api": {
-        target: "http://gateway:80",
+        target: "http://localhost:8000",
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path,
       },
     },
   },

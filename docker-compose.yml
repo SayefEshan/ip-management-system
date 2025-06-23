@@ -88,17 +88,12 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - "3000:5173"
+      - "3000:80"
     depends_on:
       - gateway
     networks:
       - app-network
-    environment:
-      - CHOKIDAR_USEPOLLING=true
 
 volumes:
   auth-db-data:
