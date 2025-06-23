@@ -1,6 +1,28 @@
+# Environment files
+.env
+.env.docker
+gateway/.env
+auth-service/.env
+app-service/.env
+
+# Laravel vendor directories
+gateway/vendor/
+auth-service/vendor/
+app-service/vendor/
+
+# Laravel storage and cache
+gateway/storage/logs/*
+auth-service/storage/logs/*
+app-service/storage/logs/*
+!*/storage/logs/.gitkeep
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
-.idea
-.vscode
-*.log
-*/vendor/
-*/node_modules/
