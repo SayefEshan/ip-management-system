@@ -1,0 +1,103 @@
+version: "3.8"
+
+services:
+  # MySQL for auth service
+  auth-db:
+    image: mysql:8.0
+    container_name: auth-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE_AUTH}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - "3307:3306"
+    volumes:
+      - auth-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # MySQL for app service
+  app-db:
+    image: mysql:8.0
+    container_name: app-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE_APP}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - "3308:3306"
+    volumes:
+      - app-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Gateway service
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    restart: unless-stopped
+    volumes:
+      - ./gateway/.env:/var/www/.env
+    ports:
+      - "8000:80"
+    depends_on:
+      - auth-service
+      - app-service
+    networks:
+      - app-network
+
+  # Auth service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    volumes:
+      - ./auth-service/.env:/var/www/.env
+    depends_on:
+      - auth-db
+    networks:
+      - app-network
+
+  # App service
+  app-service:
+    build:
+      context: ./app-service
+      dockerfile: Dockerfile
+    container_name: app-service
+    restart: unless-stopped
+    volumes:
+      - ./app-service/.env:/var/www/.env
+    depends_on:
+      - app-db
+    networks:
+      - app-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+    networks:
+      - app-network
+
+volumes:
+  auth-db-data:
+  app-db-data:
+
+networks:
+  app-network:
+    driver: bridge
