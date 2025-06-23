@@ -95,7 +95,7 @@ function Login() {
           </p>
           <div className="space-y-1 text-xs text-gray-500 text-center">
             <p>Admin: admin@ad-group.com.au / admin123</p>
-            <p>User: john@ad-group.com.au / password123</p>
+            <p>User: sayef@ad-group.com.au / password123</p>
           </div>
         </div>
       </div>

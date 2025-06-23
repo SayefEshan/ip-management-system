@@ -24,7 +24,7 @@ class AuditLogSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'user_email' => 'john@example.com',
+                'user_email' => 'sayef@ad-group.com.au',
                 'session_id' => 'session-002',
                 'action' => 'LOGIN',
                 'ip_address' => '127.0.0.2',
@@ -49,7 +49,7 @@ class AuditLogSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'user_email' => 'john@example.com',
+                'user_email' => 'sayef@ad-group.com.au',
                 'session_id' => 'session-002',
                 'action' => 'CREATE',
                 'entity_type' => 'ip_address',
@@ -102,7 +102,7 @@ class AuditLogSeeder extends Seeder
             // Recent activity
             [
                 'user_id' => 2,
-                'user_email' => 'john@example.com',
+                'user_email' => 'sayef@ad-group.com.au',
                 'session_id' => 'session-current',
                 'action' => 'LOGIN',
                 'ip_address' => '127.0.1.111',
@@ -110,7 +110,7 @@ class AuditLogSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'user_email' => 'john@example.com',
+                'user_email' => 'sayef@ad-group.com.au',
                 'session_id' => 'session-current',
                 'action' => 'CREATE',
                 'entity_type' => 'ip_address',
