@@ -16,11 +16,7 @@ git clone https://github.com/SayefEshan/ip-management-system.git
 cd ip-management-system
 ```
 
-### 2. Setup Environment Variables
-
-**IMPORTANT**: Each service requires its own `.env` file. The repository only includes `.env.example` files.
-
-#### 2 Main Environment File
+### 2 Main Environment File
 
 Copy the main `.env.example` file to `.env`:
 
