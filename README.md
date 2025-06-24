@@ -47,14 +47,17 @@ Copy and configure the auth service environment:
 cp auth-service/.env.example auth-service/.env
 ```
 
+**Generate JWT Secret Key** (CRITICAL for security):
+
+```bash
+openssl rand -base64 64
+```
+
 Update `auth-service/.env` with the following **REQUIRED** configurations:
 
 ```env
 # Application
 APP_KEY=base64:YOUR_APP_KEY_HERE
-APP_URL=http://auth-service
-AUTH_SERVICE_URL=http://auth-service
-APP_SERVICE_URL=http://app-service
 
 # JWT Secret Key (REQUIRED for authentication)
 JWT_SECRET_KEY=YOUR_SECURE_JWT_SECRET_HERE
@@ -81,9 +84,6 @@ Update `app-service/.env` with:
 ```env
 # Application
 APP_KEY=base64:YOUR_APP_KEY_HERE
-APP_URL=http://app-service
-AUTH_SERVICE_URL=http://auth-service
-APP_SERVICE_URL=http://app-service
 
 # Database
 DB_CONNECTION=mysql
@@ -107,31 +107,6 @@ Update `gateway/.env` with:
 ```env
 # Application
 APP_KEY=base64:YOUR_APP_KEY_HERE
-APP_URL=http://gateway
-AUTH_SERVICE_URL=http://auth-service
-APP_SERVICE_URL=http://app-service
-```
-
-#### 2.5 Generate Secure Keys
-
-**Generate JWT Secret Key** (CRITICAL for security):
-
-```bash
-Using OpenSSL
-openssl rand -base64 64
-```
-
-**Generate Laravel APP_KEY** for each service:
-
-```bash
-# Generate APP_KEY for auth service
-docker exec auth-service php artisan key:generate --show
-
-# Generate APP_KEY for app service
-docker exec app-service php artisan key:generate --show
-
-# Generate APP_KEY for gateway service
-docker exec gateway-service php artisan key:generate --show
 ```
 
 ### 3. Build and Start the Services
@@ -149,7 +124,22 @@ This will start:
 - Auth Database (MySQL)
 - App Database (MySQL)
 
-### 4. Run Database Migrations
+#### 4.1 Generate Secure Keys
+
+**Generate Laravel APP_KEY** for each service:
+
+```bash
+# Generate APP_KEY for auth service
+docker compose exec auth-service php artisan key:generate --show
+
+# Generate APP_KEY for app service
+docker compose exec app-service php artisan key:generate --show
+
+# Generate APP_KEY for gateway service
+docker compose exec gateway-service php artisan key:generate --show
+```
+
+### 4.2 Run Database Migrations
 
 ```bash
 docker compose exec auth-service php artisan migrate --seed
