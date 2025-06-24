@@ -6,8 +6,15 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Configure npm for better network handling
+RUN npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-timeout 300000 && \
+    npm config set registry https://registry.npmjs.org/
+
+# Clean install with force to handle optional dependencies
+RUN rm -rf node_modules package-lock.json && \
+    npm install --force
 
 # Copy source files
 COPY . .

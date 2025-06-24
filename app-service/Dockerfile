@@ -9,10 +9,9 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    nginx
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    nginx \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
@@ -23,17 +22,22 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
+# Copy composer files first for better layer caching
+COPY composer.json composer.lock ./
+
+# Install dependencies first
+RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
+
 # Copy application files
 COPY . .
 
-# Create .env from .env.example if .env doesn't exist
-RUN if [ ! -f .env ] && [ -f .env.example ]; then \
-        cp .env.example .env; \
-        echo "✅ Created .env from .env.example"; \
-    fi
+# Run composer dump-autoload to generate optimized autoloader
+RUN composer dump-autoload --optimize
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
 
 # Copy nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
@@ -44,10 +48,6 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 80
-
-# Make entrypoint executable
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set entrypoint
 ENTRYPOINT ["docker-entrypoint.sh"]

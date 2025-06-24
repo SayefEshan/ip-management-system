@@ -42,7 +42,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./gateway:/var/www
-      - /var/www/vendor
     ports:
       - "8000:80"
     depends_on:
@@ -67,7 +66,6 @@ services:
       - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - ./auth-service:/var/www
-      - /var/www/vendor
     depends_on:
       - auth-db
     networks:
@@ -89,7 +87,6 @@ services:
       - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - ./app-service:/var/www
-      - /var/www/vendor
     depends_on:
       - app-db
     networks:
