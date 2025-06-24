@@ -55,7 +55,7 @@ This will start:
 - Auth Database (MySQL)
 - App Database (MySQL)
 
-#### 4 Generate Secure Keys
+### 4 Generate Secure Keys
 
 **Generate JWT Secret Key** (CRITICAL for security):
 
@@ -67,13 +67,13 @@ Copy the generated key to the `JWT_SECRET_KEY` variable in the `auth-service/.en
 
 **Generate Laravel APP_KEY** for each service:
 
-# Generate APP_KEY for auth service
+#### Generate APP_KEY for auth service
 
 ```bash
 docker compose exec auth-service php artisan key:generate
 ```
 
-# Generate APP_KEY for app service
+#### Generate APP_KEY for app service
 
 ```bash
 docker compose exec app-service php artisan key:generate
@@ -117,14 +117,12 @@ You can use the following test accounts to log in:
   - Email: `sayef@ad-group.com.au`
   - Password: `password123`
 
-```
-
 ### 8. Architecture Overview
 
 The system is built using a microservices architecture with the following components:
+
 - **Gateway Service**: Acts as the entry point for all requests, routing them to the appropriate service.
 - **Auth Service**: Handles user authentication and authorization.
 - **App Service**: Manages IP address allocations and related operations.
 - **Frontend**: A React-based user interface for interacting with the system.
 - **Databases**: Two MySQL databases for the auth and app services.
-```
