@@ -58,6 +58,13 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     restart: unless-stopped
+    environment:
+      - DB_HOST=auth-db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE_AUTH}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - ./auth-service:/var/www
       - /var/www/vendor
@@ -73,6 +80,13 @@ services:
       dockerfile: Dockerfile
     container_name: app-service
     restart: unless-stopped
+    environment:
+      - DB_HOST=app-db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE_APP}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - ./app-service:/var/www
       - /var/www/vendor
