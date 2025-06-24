@@ -32,7 +32,7 @@ class GatewayAuth
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'X-Session-ID' => $request->header('X-Session-ID'),
-            ])->get(env('AUTH_SERVICE_URL') . '/api/auth/validate');
+            ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
 
             if ($response->successful()) {
                 $userData = $response->json();
@@ -50,7 +50,7 @@ class GatewayAuth
             // // Token expired - try to refresh if refresh token provided
             // if ($response->status() === 401 && $refreshToken) {
             //     // Refresh the token
-            //     $refreshResponse = Http::post(env('AUTH_SERVICE_URL') . '/api/auth/refresh', [
+            //     $refreshResponse = Http::post(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/refresh', [
             //         'refresh_token' => $refreshToken
             //     ]);
 
@@ -64,7 +64,7 @@ class GatewayAuth
             //         $validateResponse = Http::withHeaders([
             //             'Authorization' => 'Bearer ' . $newToken,
             //             'X-Session-ID' => $request->header('X-Session-ID'),
-            //         ])->get(env('AUTH_SERVICE_URL') . '/api/auth/validate');
+            //         ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
 
             //         if ($validateResponse->successful()) {
             //             $userData = $validateResponse->json();
