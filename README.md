@@ -12,7 +12,7 @@ A microservices-based IP address management system with audit logging capabiliti
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/SayefEshan/ip-management-system.git
 cd ip-management-system
 ```
 
