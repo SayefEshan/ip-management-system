@@ -20,7 +20,7 @@ cd ip-management-system
 
 **IMPORTANT**: Each service requires its own `.env` file. The repository only includes `.env.example` files.
 
-#### 2.1 Main Environment File
+#### 2 Main Environment File
 
 Copy the main `.env.example` file to `.env`:
 
@@ -29,6 +29,7 @@ cp .env.example .env
 ```
 
 The main `.env` file contains database configuration:
+Configure db credentials in `.env`:
 
 ```env
 # Database Configuration
@@ -39,13 +40,13 @@ DB_PASSWORD=change_this_password
 DB_ROOT_PASSWORD=change_this_root_password
 ```
 
-#### 2.2 Auth Service Environment
-
-Copy and configure the auth service environment:
+### 3. Build the Services
 
 ```bash
-cp auth-service/.env.example auth-service/.env
+docker compose build
 ```
+
+#### 4 Generate Secure Keys
 
 **Generate JWT Secret Key** (CRITICAL for security):
 
@@ -53,66 +54,25 @@ cp auth-service/.env.example auth-service/.env
 openssl rand -base64 64
 ```
 
-Update `auth-service/.env` with the following **REQUIRED** configurations:
+Copy the generated key to the `JWT_SECRET_KEY` variable in the `auth-service/.env` file.
 
-```env
-# Application
-APP_KEY=base64:YOUR_APP_KEY_HERE
-
-# JWT Secret Key (REQUIRED for authentication)
-JWT_SECRET_KEY=YOUR_SECURE_JWT_SECRET_HERE
-
-# Database
-DB_CONNECTION=mysql
-DB_HOST=auth-db
-DB_PORT=3306
-DB_DATABASE=ip_auth_service
-DB_USERNAME=db_user
-DB_PASSWORD=change_this_password
-```
-
-#### 2.3 App Service Environment
-
-Copy and configure the app service environment:
+**Generate Laravel APP_KEY** for each service:
 
 ```bash
-cp app-service/.env.example app-service/.env
+# Generate APP_KEY for auth service
+docker compose exec auth-service php artisan key:generate
+
+# Generate APP_KEY for app service
+docker compose exec app-service php artisan key:generate
+
+# Generate APP_KEY for gateway service
+docker compose exec gateway php artisan key:generate
 ```
 
-Update `app-service/.env` with:
-
-```env
-# Application
-APP_KEY=base64:YOUR_APP_KEY_HERE
-
-# Database
-DB_CONNECTION=mysql
-DB_HOST=app-db
-DB_PORT=3306
-DB_DATABASE=ip_app_service
-DB_USERNAME=db_user
-DB_PASSWORD=change_this_password
-```
-
-#### 2.4 Gateway Service Environment
-
-Copy and configure the gateway service environment:
+### 5. Start the Services
 
 ```bash
-cp gateway/.env.example gateway/.env
-```
-
-Update `gateway/.env` with:
-
-```env
-# Application
-APP_KEY=base64:YOUR_APP_KEY_HERE
-```
-
-### 3. Build and Start the Services
-
-```bash
-docker compose up -d --build
+docker compose up -d
 ```
 
 This will start:
@@ -124,29 +84,14 @@ This will start:
 - Auth Database (MySQL)
 - App Database (MySQL)
 
-#### 4.1 Generate Secure Keys
-
-**Generate Laravel APP_KEY** for each service:
-
-```bash
-# Generate APP_KEY for auth service
-docker compose exec auth-service php artisan key:generate --show
-
-# Generate APP_KEY for app service
-docker compose exec app-service php artisan key:generate --show
-
-# Generate APP_KEY for gateway service
-docker compose exec gateway-service php artisan key:generate --show
-```
-
-### 4.2 Run Database Migrations
+### 6. Run Database Migrations
 
 ```bash
 docker compose exec auth-service php artisan migrate --seed
 docker compose exec app-service php artisan migrate --seed
 ```
 
-### 5. Access the Application
+### 7. Access the Application
 
 Open your browser and navigate to:
 
@@ -160,7 +105,7 @@ The API can be accessed at:
 http://localhost:8000/api
 ```
 
-### 6. Test Accounts
+### 8. Test Accounts
 
 You can use the following test accounts to log in:
 
