@@ -47,42 +47,48 @@ class GatewayAuth
                 return $next($request);
             }
 
-            // // Token expired - try to refresh if refresh token provided
-            // if ($response->status() === 401 && $refreshToken) {
-            //     // Refresh the token
-            //     $refreshResponse = Http::post(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/refresh', [
-            //         'refresh_token' => $refreshToken
-            //     ]);
+            // Token expired - try to refresh if refresh token provided
+            if ($response->status() === 401 && $refreshToken) {
 
-            //     if ($refreshResponse->successful()) {
-            //         $newToken = $refreshResponse->json('access_token');
+                // Refresh the token
+                $refreshResponse = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $token,
+                    'X-Session-ID' => $request->header('X-Session-ID'),
+                ])->post(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/refresh', [
+                    'refresh_token' => $refreshToken
+                ]);
 
-            //         // Update request with new token
-            //         $request->headers->set('Authorization', 'Bearer ' . $newToken);
+                if ($refreshResponse->successful()) {
+                    $newToken = $refreshResponse->json('access_token');
 
-            //         // Validate new token and get user context
-            //         $validateResponse = Http::withHeaders([
-            //             'Authorization' => 'Bearer ' . $newToken,
-            //             'X-Session-ID' => $request->header('X-Session-ID'),
-            //         ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
+                    // Update request with new token
+                    $request->headers->set('Authorization', 'Bearer ' . $newToken);
 
-            //         if ($validateResponse->successful()) {
-            //             $userData = $validateResponse->json();
-            //             $request->headers->set('X-User-Context', json_encode([
-            //                 'id' => $userData['user']['id'],
-            //                 'email' => $userData['user']['email'],
-            //                 'is_super_admin' => $userData['user']['is_super_admin'],
-            //                 'session_id' => $userData['session_id'],
-            //             ]));
+                    // Validate new token and get user context
+                    $validateResponse = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $newToken,
+                        'X-Session-ID' => $request->header('X-Session-ID'),
+                    ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
 
-            //             // Process request with new token
-            //             $response = $next($request);
+                    if ($validateResponse->successful()) {
+                        $userData = $validateResponse->json();
+                        $request->headers->set('X-User-Context', json_encode([
+                            'id' => $userData['user']['id'],
+                            'email' => $userData['user']['email'],
+                            'is_super_admin' => $userData['user']['is_super_admin'],
+                            'session_id' => $userData['session_id'],
+                        ]));
 
-            //             // Send new token back to client
-            //             $response->headers->set('X-New-Access-Token', $newToken);
-            //         }
-            //     }
-            // }
+                        // Process request with new token
+                        $response = $next($request);
+
+                        // Send new token back to client
+                        $response->headers->set('X-New-Access-Token', $newToken);
+
+                        return $response;
+                    }
+                }
+            }
 
             return response()->json([
                 'error' => 'Unauthorized',
