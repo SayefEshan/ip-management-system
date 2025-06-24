@@ -16,7 +16,7 @@ git clone https://github.com/SayefEshan/ip-management-system.git
 cd ip-management-system
 ```
 
-### 2 Main Environment File
+### 2. Main Environment File
 
 Copy the main `.env.example` file to `.env`:
 
@@ -51,7 +51,7 @@ This will start:
 - Auth Database (MySQL)
 - App Database (MySQL)
 
-### 4 Generate Secure Keys
+### 4. Generate Secure Keys
 
 **Generate JWT Secret Key** (CRITICAL for security):
 
@@ -75,7 +75,7 @@ docker compose exec auth-service php artisan key:generate
 docker compose exec app-service php artisan key:generate
 ```
 
-# Generate APP_KEY for gateway service
+#### Generate APP_KEY for gateway service
 
 ```bash
 docker compose exec gateway php artisan key:generate
@@ -85,6 +85,9 @@ docker compose exec gateway php artisan key:generate
 
 ```bash
 docker compose exec auth-service php artisan migrate --seed
+```
+
+```bash
 docker compose exec app-service php artisan migrate --seed
 ```
 
@@ -122,3 +125,14 @@ The system is built using a microservices architecture with the following compon
 - **App Service**: Manages IP address allocations and related operations.
 - **Frontend**: A React-based user interface for interacting with the system.
 - **Databases**: Two MySQL databases for the auth and app services.
+
+### 9. API Documentation and Testing
+
+The system includes a comprehensive Postman collection for testing all API endpoints.
+
+#### Importing the Postman Collection
+
+1. Download and install [Postman](https://www.postman.com/downloads/) if you haven't already
+2. Open Postman and click on "Import" in the top left corner
+3. Choose "File" and select the [`ip-management-API.postman_collection.json`](./ip-management-API.postman_collection.json) file from the project root
+4. Click "Import" to add the collection to your Postman workspace

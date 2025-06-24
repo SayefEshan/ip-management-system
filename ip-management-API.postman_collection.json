@@ -1,0 +1,490 @@
+{
+  "info": {
+    "_postman_id": "ip-management-system",
+    "name": "IP Management System API",
+    "description": "API collection for IP Management System with microservices architecture",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    ",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.expect(jsonData).to.have.property('refresh_token');",
+                  "    pm.expect(jsonData).to.have.property('session_id');",
+                  "    ",
+                  "    // Store tokens and session",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);",
+                  "    pm.collectionVariables.set(\"session_id\", jsonData.session_id);",
+                  "    pm.collectionVariables.set(\"user_id\", jsonData.user.id);",
+                  "    pm.collectionVariables.set(\"is_super_admin\", jsonData.user.is_super_admin);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@ad-group.com.au\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate user and receive access tokens. Only one device login allowed per user."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Token refreshed successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    ",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    ",
+                  "    // Update access token",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Session-ID",
+                "value": "{{session_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Get a new access token using refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Logout successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    ",
+                  "    // Clear stored tokens",
+                  "    pm.collectionVariables.unset(\"access_token\");",
+                  "    pm.collectionVariables.unset(\"refresh_token\");",
+                  "    pm.collectionVariables.unset(\"session_id\");",
+                  "    pm.collectionVariables.unset(\"user_id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Session-ID",
+                "value": "{{session_id}}"
+              },
+              {
+                "key": "X-Refresh-Token",
+                "value": "{{refresh_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout the current user session"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "IP Addresses",
+      "item": [
+        {
+          "name": "List IP Addresses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ip-addresses?page=1",
+              "host": ["{{base_url}}"],
+              "path": ["ip-addresses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                }
+              ]
+            },
+            "description": "Get paginated list of all IP addresses"
+          },
+          "response": []
+        },
+        {
+          "name": "Create IP Address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"IP address created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    ",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.collectionVariables.set(\"ip_id\", jsonData.data.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ip_address\": \"192.168.1.150\",\n    \"label\": \"Test Server\",\n    \"comment\": \"Development test server\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ip-addresses",
+              "host": ["{{base_url}}"],
+              "path": ["ip-addresses"]
+            },
+            "description": "Create a new IP address entry. Supports both IPv4 and IPv6."
+          },
+          "response": []
+        },
+        {
+          "name": "Update IP Address",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"label\": \"Updated Test Server\",\n    \"comment\": \"Updated development server description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ip-addresses/{{ip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["ip-addresses", "{{ip_id}}"]
+            },
+            "description": "Update IP address label and comment. Only the creator or admin can update."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete IP Address",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ip-addresses/{{ip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["ip-addresses", "{{ip_id}}"]
+            },
+            "description": "Delete an IP address (soft delete). Only super admin can delete."
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{access_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Add required headers",
+              "pm.request.headers.add({",
+              "    key: 'X-Refresh-Token',",
+              "    value: pm.collectionVariables.get('refresh_token')",
+              "});",
+              "",
+              "pm.request.headers.add({",
+              "    key: 'X-Session-ID',",
+              "    value: pm.collectionVariables.get('session_id')",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "Session Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-logs/session",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs", "session"]
+            },
+            "description": "Get audit logs for the current session only"
+          },
+          "response": []
+        },
+        {
+          "name": "User Lifetime Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-logs/user",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs", "user"]
+            },
+            "description": "Get all audit logs for the authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "IP Session Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-logs/ip/{{ip_id}}/session",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs", "ip", "{{ip_id}}", "session"]
+            },
+            "description": "Get audit logs for a specific IP address in current session"
+          },
+          "response": []
+        },
+        {
+          "name": "IP Lifetime Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-logs/ip/{{ip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs", "ip", "{{ip_id}}"]
+            },
+            "description": "Get all audit logs for a specific IP address"
+          },
+          "response": []
+        },
+        {
+          "name": "All System Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-logs/all?page=1&action=CREATE",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "action",
+                  "value": "CREATE",
+                  "description": "Filter by action: LOGIN, LOGOUT, CREATE, UPDATE, DELETE, FAILED_LOGIN"
+                },
+                {
+                  "key": "user_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "from_date",
+                  "value": "2025-06-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to_date",
+                  "value": "2025-06-30",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all audit logs in the system. Only accessible by super admin."
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{access_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Add required headers",
+              "pm.request.headers.add({",
+              "    key: 'X-Refresh-Token',",
+              "    value: pm.collectionVariables.get('refresh_token')",
+              "});",
+              "",
+              "pm.request.headers.add({",
+              "    key: 'X-Session-ID',",
+              "    value: pm.collectionVariables.get('session_id')",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "// This runs before every request in the collection"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "// Check if token was refreshed",
+          "if (pm.response.headers.has('X-New-Access-Token')) {",
+          "    const newToken = pm.response.headers.get('X-New-Access-Token');",
+          "    pm.collectionVariables.set('access_token', newToken);",
+          "    console.log('Access token automatically refreshed');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "is_super_admin",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "ip_id",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
