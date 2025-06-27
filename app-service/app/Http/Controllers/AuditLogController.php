@@ -34,7 +34,7 @@ class AuditLogController extends Controller
     {
         $userContext = $this->getUserContext($request);
 
-        $ipAddress = IPAddress::where('ip_address', $ip)->first();
+        $ipAddress = IPAddress::withTrashed()->where('ip_address', $ip)->first();
 
         if (!$ipAddress) {
             return response()->json(['message' => 'IP address not found'], 404);
@@ -52,7 +52,7 @@ class AuditLogController extends Controller
 
     public function ipLogs(Request $request, $ip)
     {
-        $ipAddress = IPAddress::where('ip_address', $ip)->first();
+        $ipAddress = IPAddress::withTrashed()->where('ip_address', $ip)->first();
 
         if (!$ipAddress) {
             return response()->json(['message' => 'IP address not found'], 404);
