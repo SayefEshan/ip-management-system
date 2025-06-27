@@ -16,6 +16,8 @@ class AuditLogController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        $this->attachIpAddressToLogs($logs);
+
         return response()->json($logs);
     }
 
@@ -26,6 +28,8 @@ class AuditLogController extends Controller
         $logs = AuditLog::where('user_id', $userContext['id'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+
+        $this->attachIpAddressToLogs($logs);
 
         return response()->json($logs);
     }
@@ -46,6 +50,8 @@ class AuditLogController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        $this->attachIpAddressToLogs($logs);
+
         return response()->json($logs);
     }
 
@@ -62,6 +68,8 @@ class AuditLogController extends Controller
             ->where('entity_id', $ipAddress->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+
+        $this->attachIpAddressToLogs($logs);
 
         return response()->json($logs);
     }
@@ -98,11 +106,25 @@ class AuditLogController extends Controller
 
         $logs = $query->orderBy('created_at', 'desc')->paginate(20);
 
+        $this->attachIpAddressToLogs($logs);
+
         return response()->json($logs);
     }
 
     private function getUserContext(Request $request)
     {
         return json_decode($request->header('X-User-Context'), true);
+    }
+
+    private function attachIpAddressToLogs($logs)
+    {
+        $ipIds = $logs->pluck('entity_id')->filter()->unique();
+        $ipAddresses = IPAddress::withTrashed()->whereIn('id', $ipIds)->get()->keyBy('id');
+
+        $logs->each(function ($log) use ($ipAddresses) {
+            if ($log->entity_type === 'ip_address' && isset($ipAddresses[$log->entity_id])) {
+                $log->entity_ip = $ipAddresses[$log->entity_id]->ip_address;
+            }
+        });
     }
 }
