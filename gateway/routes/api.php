@@ -27,8 +27,8 @@ Route::middleware('gateway.auth')->group(function () {
     // Audit log routes
     Route::get('/audit-logs/session', [GatewayController::class, 'proxyToApp']);
     Route::get('/audit-logs/user', [GatewayController::class, 'proxyToApp']);
-    Route::get('/audit-logs/ip-address/{id}/session', [GatewayController::class, 'proxyToApp']);
-    Route::get('/audit-logs/ip-address/{id}', [GatewayController::class, 'proxyToApp']);
+    Route::get('/audit-logs/ip-address/{ip}/session', [GatewayController::class, 'proxyToApp']);
+    Route::get('/audit-logs/ip-address/{ip}', [GatewayController::class, 'proxyToApp']);
     Route::get('/audit-logs/all', [GatewayController::class, 'proxyToApp']);
 });
 

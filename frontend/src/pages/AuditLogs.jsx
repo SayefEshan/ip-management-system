@@ -6,7 +6,7 @@ function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [logType, setLogType] = useState("user");
-  const [ipId, setIpId] = useState("");
+  const [ipAddress, setIpAddress] = useState("");
 
   const user = authService.getUser();
 
@@ -41,15 +41,15 @@ function AuditLogs() {
   };
 
   const fetchIpLogs = async (sessionOnly = false) => {
-    if (!ipId) {
-      alert("Please enter an IP ID");
+    if (!ipAddress) {
+      alert("Please enter an IP address");
       return;
     }
     setLoading(true);
     try {
       const response = sessionOnly
-        ? await auditService.getIpSessionLogs(ipId)
-        : await auditService.getIpLogs(ipId);
+        ? await auditService.getIpSessionLogs(ipAddress)
+        : await auditService.getIpLogs(ipAddress);
       setLogs(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch IP logs:", err);
@@ -190,13 +190,13 @@ function AuditLogs() {
               <div className="flex gap-2 flex-1">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    IP Address ID
+                    IP Address
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter IP ID (e.g., 1)"
-                    value={ipId}
-                    onChange={(e) => setIpId(e.target.value)}
+                    placeholder="Enter IP Address (e.g., 192.168.1.1)"
+                    value={ipAddress}
+                    onChange={(e) => setIpAddress(e.target.value)}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>

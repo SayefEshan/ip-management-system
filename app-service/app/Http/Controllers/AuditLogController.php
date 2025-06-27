@@ -30,13 +30,19 @@ class AuditLogController extends Controller
         return response()->json($logs);
     }
 
-    public function ipSessionLogs(Request $request, $ipId)
+    public function ipSessionLogs(Request $request, $ip)
     {
         $userContext = $this->getUserContext($request);
 
+        $ipAddress = IPAddress::where('ip_address', $ip)->first();
+
+        if (!$ipAddress) {
+            return response()->json(['message' => 'IP address not found'], 404);
+        }
+
         $logs = AuditLog::where('session_id', $userContext['session_id'])
             ->where('entity_type', 'ip_address')
-            ->where('entity_id', $ipId)
+            ->where('entity_id', $ipAddress->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -44,10 +50,16 @@ class AuditLogController extends Controller
     }
 
 
-    public function ipLogs(Request $request, $ipId)
+    public function ipLogs(Request $request, $ip)
     {
+        $ipAddress = IPAddress::where('ip_address', $ip)->first();
+
+        if (!$ipAddress) {
+            return response()->json(['message' => 'IP address not found'], 404);
+        }
+
         $logs = AuditLog::where('entity_type', 'ip_address')
-            ->where('entity_id', $ipId)
+            ->where('entity_id', $ipAddress->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

@@ -18,8 +18,8 @@ Route::prefix('ip-addresses')->group(function () {
 Route::prefix('audit-logs')->group(function () {
     Route::get('/session', [AuditLogController::class, 'sessionLogs']);
     Route::get('/user', [AuditLogController::class, 'userLogs']);
-    Route::get('/ip-address/{id}/session', [AuditLogController::class, 'ipSessionLogs']);
-    Route::get('/ip-address/{id}', [AuditLogController::class, 'ipLogs']);
+    Route::get('/ip-address/{ip}/session', [AuditLogController::class, 'ipSessionLogs']);
+    Route::get('/ip-address/{ip}', [AuditLogController::class, 'ipLogs']);
     Route::get('/all', [AuditLogController::class, 'allLogs']);
 });
 
