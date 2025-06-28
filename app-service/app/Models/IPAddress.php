@@ -31,7 +31,7 @@ class IPAddress extends Model
         return $query->where('created_by', $userId);
     }
 
-    public function canBeModifiedBy($userId, $isSuperAdmin = false)
+    public function canBeModifiedBy($userEmail, $isSuperAdmin = false)
     {
         // Super admin can modify any IP
         if ($isSuperAdmin) {
@@ -39,6 +39,6 @@ class IPAddress extends Model
         }
 
         // Regular users can only modify their own IPs
-        return $this->created_by == $userId;
+        return $this->created_by == $userEmail;
     }
 }

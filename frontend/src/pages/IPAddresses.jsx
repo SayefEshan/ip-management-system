@@ -216,10 +216,10 @@ function IPAddresses() {
                         {ip.comment || "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        User #{ip.created_by}
+                        {ip.created_by}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        {(ip.created_by === user.id ||
+                        {(ip.created_by === user.email ||
                           user.is_super_admin === 1) && (
                           <button
                             onClick={() => startEdit(ip)}

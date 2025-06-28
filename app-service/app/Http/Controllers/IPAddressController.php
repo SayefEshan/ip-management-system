@@ -59,7 +59,7 @@ class IPAddressController extends Controller
                 'ip_version' => $ipVersion,
                 'label' => $request->label,
                 'comment' => $request->comment,
-                'created_by' => $userContext['id']
+                'created_by' => $userContext['email']
             ]);
 
             // Log the action
@@ -98,7 +98,7 @@ class IPAddressController extends Controller
         $userContext = $this->getUserContext($request);
 
         // Check permissions
-        if (!$ipAddress->canBeModifiedBy($userContext['id'], $userContext['is_super_admin'])) {
+        if (!$ipAddress->canBeModifiedBy($userContext['email'], $userContext['is_super_admin'])) {
             return response()->json([
                 'message' => 'You do not have permission to modify this IP address'
             ], 403);
