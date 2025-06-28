@@ -271,13 +271,9 @@ function AuditLogs() {
                           {log.user_email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {log.entity_type === 'ip_address' && log.entity
-                            ? `IP: ${log.entity.ip_address}`
-                            : log.entity_type && log.entity_id
-                            ? `${log.entity_type} #${log.entity_id}`
+                          {log.entity_type === "ip_address" && log.entity_ip
+                            ? log.entity_ip
                             : "-"}
-                        </td>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {renderChanges(log)}
