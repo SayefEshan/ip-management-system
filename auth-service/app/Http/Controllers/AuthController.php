@@ -7,6 +7,8 @@ use App\Models\ActiveSession;
 use App\Models\RefreshToken;
 use App\Services\JWTService;
 use App\Services\AuditService;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RefreshTokenRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -25,19 +27,17 @@ class AuthController extends Controller
         $this->auditService = $auditService;
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        // Validate request
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string'
-        ]);
+        
+
+        $validated = $request->validated();
 
         // Find user
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $validated['email'])->first();
 
         // Check credentials
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
             $this->auditService->logFailedLogin($request->email, $request->ip());
 
             return response()->json([
@@ -169,15 +169,14 @@ class AuthController extends Controller
         }
     }
 
-    public function refresh(Request $request)
+    public function refresh(RefreshTokenRequest $request)
     {
-        $request->validate([
-            'refresh_token' => 'required|string'
-        ]);
+        
 
         try {
+            $validated = $request->validated();
             // Validate refresh token
-            $payload = $this->jwtService->validateToken($request->refresh_token);
+            $payload = $this->jwtService->validateToken($validated['refresh_token']);
 
             // Check if it's a refresh token
             if ($payload['type'] !== 'refresh') {

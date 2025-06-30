@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\IPAddress;
 use App\Services\AuditLogService;
+use App\Http\Requests\StoreIPAddressRequest;
+use App\Http\Requests\UpdateIPAddressRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,16 +26,24 @@ class IPAddressController extends Controller
         return response()->json($ipAddresses);
     }
 
-    public function store(Request $request)
+    public function store(StoreIPAddressRequest $request)
     {
-        $request->validate([
-            'ip_address' => 'required|string',
-            'label' => 'required|string|max:255',
-            'comment' => 'nullable|string'
-        ]);
+        
+
+        $validated = $request->validated();
 
         // Validate IP address format
-        $ipVersion = $this->validateIPAddress($request->ip_address);
+        $ipVersion = $this->validateIPAddress($validated['ip_address']);
+        if (!$ipVersion) {
+            return response()->json([
+                'message' => 'Invalid IP address format'
+            ], 422);
+        }
+
+        $validated = $request->validated();
+
+        // Validate IP address format
+        $ipVersion = $this->validateIPAddress($validated['ip_address']);
         if (!$ipVersion) {
             return response()->json([
                 'message' => 'Invalid IP address format'
@@ -46,7 +56,7 @@ class IPAddressController extends Controller
         DB::beginTransaction();
         try {
             // Check if IP already exists
-            $existing = IPAddress::where('ip_address', $request->ip_address)->first();
+            $existing = IPAddress::where('ip_address', $validated['ip_address'])->first();
             if ($existing) {
                 return response()->json([
                     'message' => 'IP address already exists'
@@ -55,10 +65,10 @@ class IPAddressController extends Controller
 
             // Create IP address
             $ipAddress = IPAddress::create([
-                'ip_address' => $request->ip_address,
+                'ip_address' => $validated['ip_address'],
                 'ip_version' => $ipVersion,
-                'label' => $request->label,
-                'comment' => $request->comment,
+                'label' => $validated['label'],
+                'comment' => $validated['comment'],
                 'created_by' => $userContext['email']
             ]);
 
@@ -80,12 +90,9 @@ class IPAddressController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateIPAddressRequest $request, $id)
     {
-        $request->validate([
-            'label' => 'required|string|max:255',
-            'comment' => 'nullable|string'
-        ]);
+        
 
         $ipAddress = IPAddress::find($id);
         if (!$ipAddress) {
@@ -106,7 +113,9 @@ class IPAddressController extends Controller
 
         DB::beginTransaction();
         try {
-            // Store old values for audit
+            $validated = $request->validated();
+
+        // Store old values for audit
             $oldValues = [
                 'label' => $ipAddress->label,
                 'comment' => $ipAddress->comment
@@ -114,8 +123,8 @@ class IPAddressController extends Controller
 
             // Update IP address
             $ipAddress->update([
-                'label' => $request->label,
-                'comment' => $request->comment
+                'label' => $validated['label'],
+                'comment' => $validated['comment']
             ]);
 
             // Log the action
