@@ -32,7 +32,7 @@ class GatewayAuth
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'X-Session-ID' => $request->header('X-Session-ID'),
-            ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
+            ])->get(config('app.services.auth.url') . '/api/auth/validate');
 
             if ($response->successful()) {
                 $userData = $response->json();
@@ -54,7 +54,7 @@ class GatewayAuth
                 $refreshResponse = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $token,
                     'X-Session-ID' => $request->header('X-Session-ID'),
-                ])->post(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/refresh', [
+                ])->post(config('app.services.auth.url') . '/api/auth/refresh', [
                     'refresh_token' => $refreshToken
                 ]);
 
@@ -68,7 +68,7 @@ class GatewayAuth
                     $validateResponse = Http::withHeaders([
                         'Authorization' => 'Bearer ' . $newToken,
                         'X-Session-ID' => $request->header('X-Session-ID'),
-                    ])->get(env('AUTH_SERVICE_URL', 'http://auth-service') . '/api/auth/validate');
+                    ])->get(config('app.services.auth.url') . '/api/auth/validate');
 
                     if ($validateResponse->successful()) {
                         $userData = $validateResponse->json();

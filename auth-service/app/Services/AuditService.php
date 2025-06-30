@@ -12,7 +12,7 @@ class AuditService
 
     public function __construct()
     {
-        $this->appServiceUrl = env('APP_SERVICE_URL', 'http://app-service');
+        $this->appServiceUrl = config('app.services.app.url');
     }
 
     public function logLogin(int $userId, string $userEmail, string $sessionId, string $ipAddress)

@@ -11,7 +11,7 @@ class JWTService
 
     public function __construct()
     {
-        $this->secretKey = env('JWT_SECRET_KEY');
+        $this->secretKey = config('app.jwt.secret');
 
         if (!$this->secretKey) {
             throw new Exception('JWT secret key not configured');

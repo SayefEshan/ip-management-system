@@ -123,4 +123,34 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT Configuration
+    |--------------------------------------------------------------------------
+    |
+    | JWT (JSON Web Token) configuration for authentication service.
+    | The secret key is used for signing and verifying tokens.
+    |
+    */
+
+    'jwt' => [
+        'secret' => env('JWT_SECRET_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Service URLs
+    |--------------------------------------------------------------------------
+    |
+    | These URLs are used for inter-service communication within the
+    | microservices architecture. Configure these based on your deployment.
+    |
+    */
+
+    'services' => [
+        'app' => [
+            'url' => env('APP_SERVICE_URL', 'http://app-service'),
+        ],
+    ],
+
 ];

@@ -123,4 +123,23 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Service URLs
+    |--------------------------------------------------------------------------
+    |
+    | These URLs are used for inter-service communication within the
+    | microservices architecture. Configure these based on your deployment.
+    |
+    */
+
+    'services' => [
+        'auth' => [
+            'url' => env('AUTH_SERVICE_URL', 'http://auth-service'),
+        ],
+        'app' => [
+            'url' => env('APP_SERVICE_URL', 'http://app-service'),
+        ],
+    ],
+
 ];
