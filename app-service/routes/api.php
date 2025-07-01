@@ -10,8 +10,8 @@ use App\Http\Controllers\IPAddressController;
 Route::prefix('ip-addresses')->group(function () {
     Route::get('/', [IPAddressController::class, 'index']);
     Route::post('/', [IPAddressController::class, 'store']);
-    Route::put('/{id}', [IPAddressController::class, 'update']);
-    Route::delete('/{id}', [IPAddressController::class, 'destroy']);
+    Route::put('/{id}', [IPAddressController::class, 'update'])->middleware('resource.owner');
+    Route::delete('/{id}', [IPAddressController::class, 'destroy'])->middleware('super.admin');
 });
 
 // Audit log routes
@@ -20,7 +20,7 @@ Route::prefix('audit-logs')->group(function () {
     Route::get('/user', [AuditLogController::class, 'userLogs']);
     Route::get('/ip-address/{ip}/session', [AuditLogController::class, 'ipSessionLogs']);
     Route::get('/ip-address/{ip}', [AuditLogController::class, 'ipLogs']);
-    Route::get('/all', [AuditLogController::class, 'allLogs']);
+    Route::get('/all', [AuditLogController::class, 'allLogs'])->middleware('super.admin');
 });
 
 Route::prefix('internal')->group(function () {

@@ -92,11 +92,6 @@ class IPAddressController extends Controller
         // Get user context
         $userContext = $this->getUserContext($request);
 
-        // Check permissions
-        if (!$ipAddress->canBeModifiedBy($userContext['email'], $userContext['is_super_admin'])) {
-            return ApiResponse::error('You do not have permission to modify this IP address', null, 403);
-        }
-
         DB::beginTransaction();
         try {
             $validated = $request->validated();
@@ -138,11 +133,6 @@ class IPAddressController extends Controller
 
         // Get user context
         $userContext = $this->getUserContext($request);
-
-        // Only super admin can delete
-        if (!$userContext['is_super_admin']) {
-            return ApiResponse::error('Only super admin can delete IP addresses', null, 403);
-        }
 
         DB::beginTransaction();
         try {

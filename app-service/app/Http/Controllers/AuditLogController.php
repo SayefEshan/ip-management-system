@@ -90,13 +90,6 @@ class AuditLogController extends Controller
 
     public function allLogs(Request $request)
     {
-        $userContext = $this->getUserContext($request);
-
-        // Check if super admin
-        if (!$userContext['is_super_admin']) {
-            return ApiResponse::error('Only super admin can view all logs', null, 403);
-        }
-
         $query = AuditLog::query();
 
         // Optional filters
