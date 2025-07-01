@@ -35,7 +35,8 @@ class GatewayAuth
             ])->get(config('app.services.auth.url') . '/api/auth/validate');
 
             if ($response->successful()) {
-                $userData = $response->json();
+                $responseData = $response->json();
+                $userData = $responseData['data']; // Extract data from standardized response
 
                 $request->headers->set('X-User-Context', json_encode([
                     'id' => $userData['user']['id'],
@@ -71,7 +72,8 @@ class GatewayAuth
                     ])->get(config('app.services.auth.url') . '/api/auth/validate');
 
                     if ($validateResponse->successful()) {
-                        $userData = $validateResponse->json();
+                        $responseData = $validateResponse->json();
+                        $userData = $responseData['data']; // Extract data from standardized response
                         $request->headers->set('X-User-Context', json_encode([
                             'id' => $userData['user']['id'],
                             'email' => $userData['user']['email'],

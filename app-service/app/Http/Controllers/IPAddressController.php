@@ -6,6 +6,8 @@ use App\Models\IPAddress;
 use App\Services\AuditLogService;
 use App\Http\Requests\StoreIPAddressRequest;
 use App\Http\Requests\UpdateIPAddressRequest;
+use App\Http\Resources\IPAddressResource;
+use App\Http\Resources\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +25,10 @@ class IPAddressController extends Controller
         $ipAddresses = IPAddress::orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return response()->json($ipAddresses);
+        return ApiResponse::success(
+            IPAddressResource::collection($ipAddresses),
+            'IP addresses retrieved successfully'
+        );
     }
 
     public function store(StoreIPAddressRequest $request)
@@ -35,19 +40,7 @@ class IPAddressController extends Controller
         // Validate IP address format
         $ipVersion = $this->validateIPAddress($validated['ip_address']);
         if (!$ipVersion) {
-            return response()->json([
-                'message' => 'Invalid IP address format'
-            ], 422);
-        }
-
-        $validated = $request->validated();
-
-        // Validate IP address format
-        $ipVersion = $this->validateIPAddress($validated['ip_address']);
-        if (!$ipVersion) {
-            return response()->json([
-                'message' => 'Invalid IP address format'
-            ], 422);
+            return ApiResponse::error('Invalid IP address format', null, 422);
         }
 
         // Get user context from header
@@ -58,9 +51,7 @@ class IPAddressController extends Controller
             // Check if IP already exists
             $existing = IPAddress::where('ip_address', $validated['ip_address'])->first();
             if ($existing) {
-                return response()->json([
-                    'message' => 'IP address already exists'
-                ], 409);
+                return ApiResponse::error('IP address already exists', null, 409);
             }
 
             // Create IP address
@@ -77,16 +68,15 @@ class IPAddressController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'IP address created successfully',
-                'data' => $ipAddress
-            ], 201);
+            return ApiResponse::success(
+                new IPAddressResource($ipAddress),
+                'IP address created successfully',
+                201
+            );
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Failed to create IP address'
-            ], 500);
+            return ApiResponse::error('Failed to create IP address', null, 500);
         }
     }
 
@@ -96,9 +86,7 @@ class IPAddressController extends Controller
 
         $ipAddress = IPAddress::find($id);
         if (!$ipAddress) {
-            return response()->json([
-                'message' => 'IP address not found'
-            ], 404);
+            return ApiResponse::error('IP address not found', null, 404);
         }
 
         // Get user context
@@ -106,9 +94,7 @@ class IPAddressController extends Controller
 
         // Check permissions
         if (!$ipAddress->canBeModifiedBy($userContext['email'], $userContext['is_super_admin'])) {
-            return response()->json([
-                'message' => 'You do not have permission to modify this IP address'
-            ], 403);
+            return ApiResponse::error('You do not have permission to modify this IP address', null, 403);
         }
 
         DB::beginTransaction();
@@ -132,16 +118,14 @@ class IPAddressController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'IP address updated successfully',
-                'data' => $ipAddress
-            ]);
+            return ApiResponse::success(
+                new IPAddressResource($ipAddress),
+                'IP address updated successfully'
+            );
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Failed to update IP address'
-            ], 500);
+            return ApiResponse::error('Failed to update IP address', null, 500);
         }
     }
 
@@ -149,9 +133,7 @@ class IPAddressController extends Controller
     {
         $ipAddress = IPAddress::find($id);
         if (!$ipAddress) {
-            return response()->json([
-                'message' => 'IP address not found'
-            ], 404);
+            return ApiResponse::error('IP address not found', null, 404);
         }
 
         // Get user context
@@ -159,9 +141,7 @@ class IPAddressController extends Controller
 
         // Only super admin can delete
         if (!$userContext['is_super_admin']) {
-            return response()->json([
-                'message' => 'Only super admin can delete IP addresses'
-            ], 403);
+            return ApiResponse::error('Only super admin can delete IP addresses', null, 403);
         }
 
         DB::beginTransaction();
@@ -174,15 +154,11 @@ class IPAddressController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'IP address deleted successfully'
-            ]);
+            return ApiResponse::success(null, 'IP address deleted successfully');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Failed to delete IP address'
-            ], 500);
+            return ApiResponse::error('Failed to delete IP address', null, 500);
         }
     }
 

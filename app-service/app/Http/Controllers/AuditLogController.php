@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\IPAddress;
+use App\Http\Resources\AuditLogResource;
+use App\Http\Resources\ApiResponse;
 use Illuminate\Http\Request;
 
 class AuditLogController extends Controller
@@ -18,7 +20,10 @@ class AuditLogController extends Controller
 
         $this->attachIpAddressToLogs($logs);
 
-        return response()->json($logs);
+        return ApiResponse::success(
+            AuditLogResource::collection($logs),
+            'Audit logs retrieved successfully'
+        );
     }
 
     public function userLogs(Request $request)
@@ -31,7 +36,10 @@ class AuditLogController extends Controller
 
         $this->attachIpAddressToLogs($logs);
 
-        return response()->json($logs);
+        return ApiResponse::success(
+            AuditLogResource::collection($logs),
+            'Audit logs retrieved successfully'
+        );
     }
 
     public function ipSessionLogs(Request $request, $ip)
@@ -41,7 +49,7 @@ class AuditLogController extends Controller
         $ipAddress = IPAddress::withTrashed()->where('ip_address', $ip)->first();
 
         if (!$ipAddress) {
-            return response()->json(['message' => 'IP address not found'], 404);
+            return ApiResponse::error('IP address not found', null, 404);
         }
 
         $logs = AuditLog::where('session_id', $userContext['session_id'])
@@ -52,7 +60,10 @@ class AuditLogController extends Controller
 
         $this->attachIpAddressToLogs($logs);
 
-        return response()->json($logs);
+        return ApiResponse::success(
+            AuditLogResource::collection($logs),
+            'Audit logs retrieved successfully'
+        );
     }
 
 
@@ -61,7 +72,7 @@ class AuditLogController extends Controller
         $ipAddress = IPAddress::withTrashed()->where('ip_address', $ip)->first();
 
         if (!$ipAddress) {
-            return response()->json(['message' => 'IP address not found'], 404);
+            return ApiResponse::error('IP address not found', null, 404);
         }
 
         $logs = AuditLog::where('entity_type', 'ip_address')
@@ -71,7 +82,10 @@ class AuditLogController extends Controller
 
         $this->attachIpAddressToLogs($logs);
 
-        return response()->json($logs);
+        return ApiResponse::success(
+            AuditLogResource::collection($logs),
+            'Audit logs retrieved successfully'
+        );
     }
 
     public function allLogs(Request $request)
@@ -80,9 +94,7 @@ class AuditLogController extends Controller
 
         // Check if super admin
         if (!$userContext['is_super_admin']) {
-            return response()->json([
-                'message' => 'Only super admin can view all logs'
-            ], 403);
+            return ApiResponse::error('Only super admin can view all logs', null, 403);
         }
 
         $query = AuditLog::query();
@@ -108,7 +120,10 @@ class AuditLogController extends Controller
 
         $this->attachIpAddressToLogs($logs);
 
-        return response()->json($logs);
+        return ApiResponse::success(
+            AuditLogResource::collection($logs),
+            'Audit logs retrieved successfully'
+        );
     }
 
     private function getUserContext(Request $request)

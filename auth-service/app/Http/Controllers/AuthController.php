@@ -9,6 +9,11 @@ use App\Services\JWTService;
 use App\Services\AuditService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RefreshTokenRequest;
+use App\Http\Resources\LoginResource;
+use App\Http\Resources\TokenRefreshResource;
+use App\Http\Resources\TokenValidationResource;
+use App\Http\Resources\UserResource;
+use App\Http\Resources\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -40,9 +45,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             $this->auditService->logFailedLogin($request->email, $request->ip());
 
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+            return ApiResponse::error('Invalid credentials', null, 401);
         }
 
         // Check if user already logged in
@@ -51,9 +54,7 @@ class AuthController extends Controller
             ->first();
 
         if ($existingSession) {
-            return response()->json([
-                'message' => 'User already logged in on another device'
-            ], 403);
+            return ApiResponse::error('User already logged in on another device', null, 403);
         }
 
         DB::beginTransaction();
@@ -95,25 +96,17 @@ class AuthController extends Controller
 
             DB::commit();
 
-            return response()->json([
+            return new LoginResource([
                 'access_token' => $accessToken['token'],
                 'refresh_token' => $refreshToken['token'],
-                'token_type' => 'Bearer',
                 'expires_in' => $accessToken['expires_in'],
                 'session_id' => $sessionId,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'is_super_admin' => $user->is_super_admin
-                ]
+                'user' => $user
             ]);
         } catch (Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Login failed'
-            ], 500);
+            return ApiResponse::error('Login failed', null, 500);
         }
     }
 
@@ -123,9 +116,7 @@ class AuthController extends Controller
             $token = $request->bearerToken();
 
             if (!$token) {
-                return response()->json([
-                    'message' => 'Token not provided'
-                ], 401);
+                return ApiResponse::error('Token not provided', null, 401);
             }
 
             // Validate and decode token
@@ -156,16 +147,11 @@ class AuthController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Successfully logged out'
-            ]);
+            return ApiResponse::success(null, 'Successfully logged out');
         } catch (Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Logout failed',
-                'error' => $e->getMessage()
-            ], 400);
+            return ApiResponse::error('Logout failed', ['error' => $e->getMessage()], 400);
         }
     }
 
@@ -230,18 +216,14 @@ class AuthController extends Controller
 
             DB::commit();
 
-            return response()->json([
+            return new TokenRefreshResource([
                 'access_token' => $newAccessToken['token'],
-                'token_type' => 'Bearer',
                 'expires_in' => $newAccessToken['expires_in']
             ]);
         } catch (Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Token refresh failed',
-                'error' => $e->getMessage()
-            ], 401);
+            return ApiResponse::error('Token refresh failed', ['error' => $e->getMessage()], 401);
         }
     }
 
@@ -278,20 +260,13 @@ class AuthController extends Controller
                 throw new Exception('User not found');
             }
 
-            return response()->json([
+            return new TokenValidationResource([
                 'valid' => true,
-                'user' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'is_super_admin' => $user->is_super_admin
-                ],
+                'user' => $user,
                 'session_id' => $payload['session_id']
             ]);
         } catch (Exception $e) {
-            return response()->json([
-                'valid' => false,
-                'message' => $e->getMessage()
-            ], 401);
+            return ApiResponse::error($e->getMessage(), ['valid' => false], 401);
         }
     }
 }

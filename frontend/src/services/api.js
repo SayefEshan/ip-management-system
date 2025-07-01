@@ -37,6 +37,16 @@ api.interceptors.response.use(
       localStorage.clear();
       window.location.href = "/login";
     }
+    
+    // Standardize error response format
+    if (error.response?.data) {
+      const errorData = error.response.data;
+      // If it's our standardized error format, keep it as is
+      if (errorData.success === false) {
+        error.response.data = errorData;
+      }
+    }
+    
     return Promise.reject(error);
   }
 );
